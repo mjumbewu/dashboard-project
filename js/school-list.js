@@ -2,6 +2,7 @@ const schoolList = document.querySelector('.school-list');
 
 function initializeList(schools) {
   addSchoolsToList(schools);
+  return schoolList;
 }
 
 function addSchoolsToList(schools) {
