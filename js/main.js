@@ -1,6 +1,6 @@
-import { initializeMap } from "./school-map.js";
-import { initializeList } from "./school-list.js";
-import { initializeAddressEntry } from "./address-entry.js";
+import { initializeMap } from './school-map.js';
+import { initializeList } from './school-list.js';
+import { initializeAddressEntry } from './address-entry.js';
 
 const schoolsResp = await fetch('data/schools.json');
 const schools = await schoolsResp.json();
