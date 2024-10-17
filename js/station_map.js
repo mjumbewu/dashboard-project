@@ -14,6 +14,8 @@ function initMap(el, events) {
   const dataLayer = L.layerGroup();
   dataLayer.addTo(map);
 
+  // Create an animated icon for the geolocation marker.
+  // Pulsating circle adapted from https://codepen.io/shaneparsons/pen/MpgEma
   const geolocationIconHtml = `
     <svg width="20" height="20" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
       <circle class="pulsing-circle" cx="20" cy="20" r="10" fill="none">
