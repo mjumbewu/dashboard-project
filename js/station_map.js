@@ -14,7 +14,22 @@ function initMap(el, events) {
   const dataLayer = L.layerGroup();
   dataLayer.addTo(map);
 
-  const positionMarker = L.circleMarker([0, 0], { radius: 5 });
+  const geolocationIconHtml = `
+    <svg width="20" height="20" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle class="pulsing-circle" cx="20" cy="20" r="10" fill="none">
+        <animate attributeName="r" from="8" to="20" dur="1.5s" begin="0s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite"/>
+      </circle>
+      <circle class="inner-circle" cx="20" cy="20" r="10"/>
+    </svg>
+  `;
+  const geolocationIcon = L.divIcon({
+    className: 'geolocation-icon',
+    html: geolocationIconHtml,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+  const geolocationMarker = L.marker([0, 0], { icon: geolocationIcon });
 
   // Listen for the stationsloaded event, which is fired when the station data
   // is done downloading.
@@ -28,8 +43,8 @@ function initMap(el, events) {
   // location is found.
   events.addEventListener('positionfound', (evt) => {
     const pos = evt.detail;
-    positionMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
-    positionMarker.addTo(map);
+    geolocationMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+    geolocationMarker.addTo(map);
     map.setView([pos.coords.latitude, pos.coords.longitude], 16);
   });
 }

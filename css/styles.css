@@ -68,6 +68,15 @@ body {
   align-items: center;
 }
 
+.geolocation-icon .pulsing-circle {
+  stroke: blue;
+  stroke-width: 2px;
+}
+
+.geolocation-icon .inner-circle {
+  fill: blue;
+}
+
 .bike-search-controls {
   border: 0;
   padding: 0.5rem;
