@@ -8,7 +8,7 @@ function initMap(el, events) {
     tileSize: 512,
     zoomOffset: -1,
     maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
 
   const dataLayer = L.layerGroup();
