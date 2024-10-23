@@ -23,32 +23,43 @@ function initList(el, events) {
           -->
         </li>
       `);
-      stationListItems[station.properties.station_id] = listItem;
-      initListItem(listItem, station, events);
+      stationListItems[station.properties.station_id] = {listItem, station};
       el.appendChild(listItem);
     }
+    updateStationStatusInfo();
   });
 
-  function updateStationStatusInfo() {
+  function sortListItemsByDistance() {
+    el.innerHTML = '';
+    const items = Object.values(stationListItems);
+    items.sort((a, b) => {
+      const aDistance = a.station.properties.distance || Infinity;
+      const bDistance = b.station.properties.distance || Infinity;
+      return aDistance - bDistance;
+    });
+    for (const {station, listItem} of items) {
+      el.appendChild(listItem);
+      listItem.querySelector('.distance').textContent = `${station.properties.distance.toFixed(2)} mi`;
+    }
+  }
 
+  function updateStationStatusInfo() {
+    for (const {listItem, station} of Object.values(stationListItems)) {
+      const bikes = station.properties.status.num_bikes_available;
+      listItem.querySelector('.available-bikes').textContent = `${bikes} bike${bikes !== 1 ? 's' : ''}`;
+
+      const docks = station.properties.status.num_docks_available;
+      listItem.querySelector('.available-docks').textContent = `${docks} dock${docks !== 1 ? 's' : ''}`;
+    }
   }
 
   events.addEventListener('statusesupdated', (evt) => {
-    const statuses = evt.detail;
-    for (const [stationId, status] of Object.entries(statuses)) {
-      const listItem = stationListItems[stationId];
-      if (!listItem) {
-        continue;
-      }
-
-      listItem.querySelector('.available-bikes').textContent = `${status.num_bikes_available} bikes`;
-      listItem.querySelector('.available-docks').textContent = `${status.num_docks_available} docks`;
-    }
+    updateStationStatusInfo();
   });
-}
 
-function initListItem(el, station, events) {
-
+  events.addEventListener('updatecenter', (evt) => {
+    sortListItemsByDistance();
+  });
 }
 
 export { initList };

@@ -1,3 +1,5 @@
+import * as turf from 'https://esm.run/@turf/turf';
+
 const STATION_ICON_SVG = `
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
@@ -87,23 +89,11 @@ function initMap(el, events) {
     iconAnchor: [25, 43],
   });
 
-  // Listen for the stationsloaded event, which is fired when the station data
-  // is done downloading.
-  events.addEventListener('stationsloaded', (evt) => {
-    const stations = evt.detail;
-    for (const station of stations) {
-      // Flip around the coordinates to be [lat, lng].
-      const latlng = [station.geometry.coordinates[1], station.geometry.coordinates[0]];
-      // Create a marker for the station and add it to the stations layer.
-      const marker = L.marker(latlng, { icon: stationIcon });
-      marker.feature = station;
-      marker.bindTooltip(station.properties.name);
-      marker.addTo(stationsLayer);
-    }
 
-    updateStationMarkers();
-  });
-
+  /**
+   * Update the station markers to reflect the current station statuses.
+   * This function is called every time the statusesupdated event is fired.
+   */
   function updateStationMarkers() {
     stationsLayer.eachLayer((marker) => {
       const station = marker.feature;
@@ -126,6 +116,36 @@ function initMap(el, events) {
     console.log('Updated station markers');
   }
 
+  function updateMapCenterpoint() {
+    const center = map.getCenter();
+
+    stationsLayer.eachLayer((marker) => {
+      const station = marker.feature;
+      const distance = turf.distance([center.lng, center.lat], station.geometry, { units: 'miles' });
+      station.properties.distance = distance;
+    });
+
+    const evt = new CustomEvent('updatecenter', { detail: [center.lng, center.lat] });
+    events.dispatchEvent(evt);
+  }
+
+  // Listen for the stationsloaded event, which is fired when the station data
+  // is done downloading.
+  events.addEventListener('stationsloaded', (evt) => {
+    const stations = evt.detail;
+    for (const station of stations) {
+      // Flip around the coordinates to be [lat, lng].
+      const latlng = [station.geometry.coordinates[1], station.geometry.coordinates[0]];
+      // Create a marker for the station and add it to the stations layer.
+      const marker = L.marker(latlng, { icon: stationIcon });
+      marker.feature = station;
+      marker.bindTooltip(station.properties.name);
+      marker.addTo(stationsLayer);
+    }
+
+    updateStationMarkers();
+  });
+
   // Listen for the statusesupdated event, which is fired when the station
   // statuses are updated.
   events.addEventListener('statusesupdated', (evt) => {
@@ -139,6 +159,11 @@ function initMap(el, events) {
     geolocationMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
     geolocationMarker.addTo(map);
     map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+  });
+
+  // Listen for when the map moves and update the centerpoint
+  map.on('moveend', (evt) => {
+    updateMapCenterpoint();
   });
 }
 

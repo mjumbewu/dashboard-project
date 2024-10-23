@@ -15,6 +15,11 @@ import { initList } from './station_list.js';
 //
 // - positionfound: Fired when the user's location is found.
 //     Detail is a GeolocationPosition object.
+//     (See geolocation.js)
+//
+// - updatecenter: Fired when the map centerpoint is updated.
+//     Detail is an array of [longitude, latitude].
+//     (See station_map.js)
 //
 const events = new EventTarget();
 
