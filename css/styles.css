@@ -84,13 +84,13 @@ body {
   justify-content: space-between
 }
 
-.station-list {
+.stations-list {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
-.station-list .station {
+.stations-list .station {
   display: grid;
   grid-template-areas: "name             name"
                         "blank           distance"
@@ -103,7 +103,7 @@ body {
   border-bottom: 1px solid black;
 }
 
-.station-list .station:first-child {
+.stations-list .station:first-child {
   border-top: 1px solid black;
 }
 
