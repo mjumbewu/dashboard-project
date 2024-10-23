@@ -46,7 +46,7 @@ downloadStationData().then((stations) => {
 
   // Update the station statuses every 30 seconds.
   setInterval(async () => {
-    const [, statuses] = await updateStationStatuses();
+    const [, statuses] = await updateStationStatuses(stations);
     console.log('Downloaded station statuses');
     const evt = new CustomEvent('statusesupdated', { detail: statuses });
     events.dispatchEvent(evt);
