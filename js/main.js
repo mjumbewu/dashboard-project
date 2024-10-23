@@ -2,6 +2,7 @@ import { downloadStationData, updateStationStatuses } from './station_data.js';
 import { startGeolocation } from './geolocation.js';
 import { initMap } from './station_map.js';
 import { initList } from './station_list.js';
+import { initAddressSearch } from './address_search.js';
 
 // Create an event bus to allow components to communicate with each other.
 // Custom events on the event bus include:
@@ -20,6 +21,12 @@ import { initList } from './station_list.js';
 // - updatecenter: Fired when the map centerpoint is updated.
 //     Detail is an array of [longitude, latitude].
 //     (See station_map.js)
+//
+// - autocompleteselected: Fired when the user selects an autocompleted
+//   address option.
+//     Detail is a GeoJSON feature representing the selected address,
+//     with a name and address property.
+//     (See address_search.js)
 //
 const events = new EventTarget();
 
@@ -46,11 +53,18 @@ downloadStationData().then((stations) => {
   }, 30000);
 });
 
+const mapboxKey = 'pk.eyJ1IjoibWp1bWJlLXRlc3QiLCJhIjoiY2w3ZTh1NTIxMTgxNTQwcGhmODU2NW5kaSJ9.pBPd19nWO-Gt-vTf1pOHBA';
+
 // Initialize the map and list components.
 const mapEl = document.querySelector('.map');
-initMap(mapEl, events);
+initMap(mapEl, events, mapboxKey);
 
 const listEl = document.querySelector('.stations-list');
 initList(listEl, events);
 
+// Initialize the address search component.
+const searchEl = document.querySelector('[name="address-search"]');
+initAddressSearch(searchEl, events, mapboxKey);
+
+// Start watching the user's location.
 startGeolocation(events);

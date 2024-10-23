@@ -8,6 +8,10 @@ body {
   margin: 0;
 }
 
+.hidden {
+  display: none;
+}
+
 .map-section {
   position: relative;
   width: 100%;
@@ -34,7 +38,7 @@ body {
   gap: 0.5rem;
   justify-content: space-between;
   position: relative;
-  z-index: 1000; /* This z-index setting matches the z-index of the map controls like zoom */
+  z-index: 1001; /* This z-index setting is one higher than the z-index of the map controls like zoom */
 }
 
 .map-search-controls input {
@@ -52,6 +56,26 @@ body {
   background-position: 98% center;
   padding-right: 1.2em;
   width: 60%
+}
+
+.autocomplete-options {
+  position: absolute;
+  list-style-type: none;
+  padding: 0;
+  left: 0.5rem;
+  right: 0.5rem;
+  margin-top: 1.5rem;
+  background-color: white;
+}
+
+.autocomplete-option {
+  padding: 0.5rem;
+  border: 1px solid black;
+  border-bottom-width: 0;
+}
+
+.autocomplete-option:last-child {
+  border-bottom-width: 1px;
 }
 
 [name="time-search"] {

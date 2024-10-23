@@ -1,8 +1,4 @@
-function htmlToElement(html) {
-  const template = document.createElement('template');
-  template.innerHTML = html;
-  return template.content.firstElementChild;
-}
+import { htmlToElement } from './dom_utils.js';
 
 function initList(el, events) {
   el.innerHTML = '';

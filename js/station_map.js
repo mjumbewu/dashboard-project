@@ -46,10 +46,9 @@ const STATION_ICON_SVG = `
 </svg>
 `;
 
-function initMap(el, events) {
+function initMap(el, events, mapboxKey) {
   const map = L.map(el, { maxZoom: 18, zoomSnap: 0 }).setView([39.95, -75.16], 12);
 
-  const mapboxKey = 'pk.eyJ1IjoibWp1bWJlLXRlc3QiLCJhIjoiY2w3ZTh1NTIxMTgxNTQwcGhmODU2NW5kaSJ9.pBPd19nWO-Gt-vTf1pOHBA';
   const mapboxStyle = 'mapbox/streets-v12';
 
   L.tileLayer(`https://api.mapbox.com/styles/v1/${mapboxStyle}/tiles/512/{z}/{x}/{y}{r}?access_token=${mapboxKey}`, {
@@ -164,6 +163,14 @@ function initMap(el, events) {
   // Listen for when the map moves and update the centerpoint
   map.on('moveend', (evt) => {
     updateMapCenterpoint();
+  });
+
+  // Listen for when an autocompleted address option is selected and update the
+  // map centerpoint.
+  events.addEventListener('autocompleteselected', (evt) => {
+    const feature = evt.detail;
+    const [lng, lat] = feature.geometry.coordinates;
+    map.setView([lat, lng], 16);
   });
 }
 
