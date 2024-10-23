@@ -23,14 +23,15 @@
 
       <section class="station-list-section">
         <fieldset class="bike-search-controls">
-          <label class="electric-bikes-only-label">
-            <input type="checkbox" name="electric-bikes-only">
-            🗲🗲🗲
-          </label>
+          <select name="bike-type">
+            <option value="all">Any bikes</option>
+            <option value="classic">No E-bikes</option>
+            <option value="electric">Only E-bikes</option>
+          </select>
 
           <label class="min-battery-level-label">
             🔋
-            <input type="range" name="min-battery-level" min="0" max="100" value="0">
+            <input type="range" name="min-battery-level" min="0" max="100" value="50">
           </label>
         </fieldset>
 

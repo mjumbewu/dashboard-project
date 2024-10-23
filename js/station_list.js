@@ -2,6 +2,9 @@ import { htmlToElement } from './dom_utils.js';
 
 function initList(el, events) {
   el.innerHTML = '';
+  let showClassicBikes = true;
+  let showElectricBikes = true;
+  let minBatteryLevel = 0;
 
   const stationListItems = {};
   events.addEventListener('stationsloaded', (evt) => {
@@ -41,7 +44,9 @@ function initList(el, events) {
 
   function updateStationStatusInfo() {
     for (const {listItem, station} of Object.values(stationListItems)) {
-      const bikes = station.properties.status.num_bikes_available;
+      const bikes =
+        (showClassicBikes ? station.properties.status.num_bikes_available_types['classic'] : 0) +
+        (showElectricBikes ? station.properties.status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0);
       listItem.querySelector('.available-bikes').textContent = `${bikes} bike${bikes !== 1 ? 's' : ''}`;
 
       const docks = station.properties.status.num_docks_available;
@@ -55,6 +60,13 @@ function initList(el, events) {
 
   events.addEventListener('updatecenter', (evt) => {
     sortListItemsByDistance();
+  });
+
+  events.addEventListener('bikefilterchange', (evt) => {
+    showClassicBikes = evt.detail.classic;
+    showElectricBikes = evt.detail.electric;
+    minBatteryLevel = evt.detail.minBattery;
+    updateStationStatusInfo();
   });
 }
 

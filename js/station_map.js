@@ -88,6 +88,9 @@ function initMap(el, events, mapboxKey) {
     iconAnchor: [25, 43],
   });
 
+  let showClassicBikes = true;
+  let showElectricBikes = true;
+  let minBatteryLevel = 0;
 
   /**
    * Update the station markers to reflect the current station statuses.
@@ -97,24 +100,34 @@ function initMap(el, events, mapboxKey) {
     stationsLayer.eachLayer((marker) => {
       const station = marker.feature;
       const status = station.properties.status;
+      const bikes =
+        (showClassicBikes ? status.num_bikes_available_types['classic'] : 0) +
+        (showElectricBikes ? status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0);
+      const docks = status.num_docks_available;
 
       // Calculate the total capacity of the station as the sum of the number
       // of bikes and the number of docks available. Convert the values to
       // decimal numbers instead of integers by multiplying by 1.0.
-      const capacity = 1.0 * status.num_bikes_available + status.num_docks_available;
+      const capacity = 1.0 * bikes + docks;
 
       // Update the position and height of the rect with id stationCapacity.
       const rect = marker.getElement().querySelector('#stationCapacity');
       const svg = marker.getElement().querySelector('svg');
-      const svgHeight = svg.viewBox.baseVal.height;
-      const newRectHeight = (status.num_bikes_available / capacity) * svgHeight;
-      const newRectY = svgHeight - newRectHeight;
+      const padding = 3;
+      const svgTop = svg.viewBox.baseVal.y;
+      const svgHeight = svg.viewBox.baseVal.height - padding * 2;
+      const newRectHeight = capacity > 0 ? (bikes / capacity) * svgHeight : 0;
+      const newRectY = svgTop + svgHeight - newRectHeight + padding;
       rect.setAttribute('height', newRectHeight);
       rect.setAttribute('y', newRectY);
     });
-    console.log('Updated station markers');
   }
 
+  /**
+   * Update the distance property of each station to reflect the distance from
+   * the current map centerpoint. This function is called every time the map
+   * moves.
+   */
   function updateMapCenterpoint() {
     const center = map.getCenter();
 
@@ -171,6 +184,15 @@ function initMap(el, events, mapboxKey) {
     const feature = evt.detail;
     const [lng, lat] = feature.geometry.coordinates;
     map.setView([lat, lng], 16);
+  });
+
+  // Listen for when the bikes the user wants to see changes and update the
+  // station markers.
+  events.addEventListener('bikefilterchange', (evt) => {
+    showClassicBikes = evt.detail.classic;
+    showElectricBikes = evt.detail.electric;
+    minBatteryLevel = evt.detail.minBattery;
+    updateStationMarkers();
   });
 }
 

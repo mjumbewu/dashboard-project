@@ -3,6 +3,7 @@ import { startGeolocation } from './geolocation.js';
 import { initMap } from './station_map.js';
 import { initList } from './station_list.js';
 import { initAddressSearch } from './address_search.js';
+import { initBikeSearchFilters } from './bike_search_filters.js';
 
 // Create an event bus to allow components to communicate with each other.
 // Custom events on the event bus include:
@@ -47,7 +48,6 @@ downloadStationData().then((stations) => {
   // Update the station statuses every 30 seconds.
   setInterval(async () => {
     const [, statuses] = await updateStationStatuses(stations);
-    console.log('Downloaded station statuses');
     const evt = new CustomEvent('statusesupdated', { detail: statuses });
     events.dispatchEvent(evt);
   }, 30000);
@@ -65,6 +65,10 @@ initList(listEl, events);
 // Initialize the address search component.
 const searchEl = document.querySelector('[name="address-search"]');
 initAddressSearch(searchEl, events, mapboxKey);
+
+// Initialize the bike filters component.
+const filtersEl = document.querySelector('.bike-search-controls');
+initBikeSearchFilters(filtersEl, events);
 
 // Start watching the user's location.
 startGeolocation(events);

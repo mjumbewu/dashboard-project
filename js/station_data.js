@@ -36,11 +36,33 @@ async function downloadStationStatuses() {
   return statuses;
 }
 
+async function downloadStationBikes() {
+  const geojsonStatusResponse = await fetch(
+    'https://bts-status.bicycletransit.workers.dev/phl',
+  );
+  const geojsonStatusData = await geojsonStatusResponse.json();
+  const geojsonStatuses = geojsonStatusData.features;
+
+  const bikes = {};
+  for (const status of geojsonStatuses) {
+    bikes[`bcycle_indego_${status.properties.id}`] = status.properties.bikes;
+  }
+
+  return bikes;
+}
+
 async function updateStationStatuses(stations) {
   const statuses = await downloadStationStatuses();
+  const bikes = await downloadStationBikes();
+
+  for (const [stationId, status] of Object.entries(statuses)) {
+    const stationBikes = bikes[stationId];
+    status.bikes = stationBikes;
+  }
+
   for (const station of stations) {
-    const status = statuses[station.properties.station_id];
-    station.properties.status = status;
+    const stationStatus = statuses[station.properties.station_id];
+    station.properties.status = stationStatus;
   }
 
   return [stations, statuses];
