@@ -178,6 +178,16 @@ function initMap(el, events, mapboxKey) {
     updateMapCenterpoint();
   });
 
+  // Listen for when the user manually moves the map center by dragging or
+  // zooming and let off a manual center event.
+  map.on('dragend', () => {
+    const center = map.getCenter();
+    const evt = new CustomEvent('manualadjust', { detail: [center.lng, center.lat] });
+    console.log('manualcenter event fired');
+    events.dispatchEvent(evt);
+  });
+
+
   // Listen for when an autocompleted address option is selected and update the
   // map centerpoint.
   events.addEventListener('autocompleteselected', (evt) => {

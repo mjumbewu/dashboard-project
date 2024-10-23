@@ -29,6 +29,19 @@ import { initBikeSearchFilters } from './bike_search_filters.js';
 //     with a name and address property.
 //     (See address_search.js)
 //
+// - manualadjust: Fired when the map center changes because of some user
+//   interaction.
+//     Detail is an array of [longitude, latitude].
+//     (See station_map.js)
+//     (See address_search.js)
+//
+// - bikefilterchange: Fired when the bike search filters change.
+//     Detail is an object with the following properties:
+//       - electric: Whether electric bikes are allowed.
+//       - classic: Whether classic bikes are allowed.
+//       - minBattery: Minimum battery level for electric bikes.
+//     (See bike_search_filters.js)
+//
 const events = new EventTarget();
 
 // Download stations data and fire a stationsloaded event to notify other

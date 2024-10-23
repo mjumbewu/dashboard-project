@@ -34,8 +34,11 @@ function initAddressSearch(el, events, mapboxKey) {
               address: place.properties.full_address,
             },
           };
-          const evt = new CustomEvent('autocompleteselected', { detail: feature });
-          events.dispatchEvent(evt);
+          const autocompleteEvt = new CustomEvent('autocompleteselected', { detail: feature });
+          events.dispatchEvent(autocompleteEvt);
+
+          const manualAdjustEvt = new CustomEvent('manualadjust', { detail: place.geometry.coordinates });
+          events.dispatchEvent(manualAdjustEvt);
 
           el.value = place.properties.full_address;
           autocompleteOptionsList.classList.add('hidden');

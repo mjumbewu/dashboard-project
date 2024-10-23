@@ -9,6 +9,12 @@ function startGeolocation(events) {
   }
 
   const geolocationId = navigator.geolocation.watchPosition(handlePositionSuccess, handlePositionError, {enableHighAccuracy: true});
+
+  events.addEventListener('manualadjust', () => {
+    console.log('Stopping geolocation watch');
+    navigator.geolocation.clearWatch(geolocationId);
+  });
+
   return geolocationId;
 }
 
