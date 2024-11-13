@@ -43,6 +43,10 @@ import { initLocationBar } from './location_bar.js';
 //       - minBattery: Minimum battery level for electric bikes.
 //     (See bike_search_filters.js)
 //
+// - stationselected: Fired when a station is selected in the list or on the map.
+//     Detail is a GeoJSON feature representing the selected station.
+//     (See station_list.js)
+//
 const events = new EventTarget();
 
 // Download stations data and fire a stationsloaded event to notify other

@@ -20,9 +20,26 @@ function initList(el, events) {
           <span class="next-drop-off-est" title="Approximate time between drop offs of suitable bikes">(~10 min)</span>
           <span class="next-pick-up-est" title="Approximate time between docks opening up">(~15 min)</span>
           -->
+
+          <div class="details">
+            <div class="report-dock-count">
+              <p>Are we showing the wrong number of docks available? Adjust the number so that other riders know:</p>
+              <button class="report-dock-count-button increment" title="Add 1 to the number of docks available">+</button>
+              <button class="report-dock-count-button decrement" title="Subtract 1 from the number of docks available">-</button>
+            </div>
+          </div>
         </li>
       `);
       stationListItems[station.properties.station_id] = {listItem, station};
+
+      listItem.addEventListener('click', () => {
+        if (listItem.classList.contains('selected')) {
+          events.dispatchEvent(new CustomEvent('stationdeselected', { detail: station }));
+        } else {
+          events.dispatchEvent(new CustomEvent('stationselected', { detail: station }));
+        }
+      });
+
       el.appendChild(listItem);
     }
     updateStationStatusInfo();
@@ -54,6 +71,23 @@ function initList(el, events) {
     }
   }
 
+  function deselectListItem(stationId) {
+    stationListItems[stationId].listItem.classList.remove('selected');
+    stationListItems[stationId].listItem.setAttribute('aria-expanded', 'false');
+  }
+
+  function deselectAllListItems() {
+    for (const {listItem} of Object.values(stationListItems)) {
+      listItem.classList.remove('selected');
+      listItem.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function selectListItem(stationId) {
+    stationListItems[stationId].listItem.classList.add('selected');
+    stationListItems[stationId].listItem.setAttribute('aria-expanded', 'true');
+  }
+
   events.addEventListener('statusesupdated', (evt) => {
     updateStationStatusInfo();
   });
@@ -67,6 +101,17 @@ function initList(el, events) {
     showElectricBikes = evt.detail.electric;
     minBatteryLevel = evt.detail.minBattery;
     updateStationStatusInfo();
+  });
+
+  events.addEventListener('stationselected', (evt) => {
+    const stationId = evt.detail.properties.station_id;
+    deselectAllListItems();
+    selectListItem(stationId);
+  });
+
+  events.addEventListener('stationdeselected', (evt) => {
+    const stationId = evt.detail.properties.station_id;
+    deselectListItem(stationId);
   });
 }
 
