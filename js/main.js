@@ -4,6 +4,7 @@ import { initMap } from './station_map.js';
 import { initList } from './station_list.js';
 import { initAddressSearch } from './address_search.js';
 import { initBikeSearchFilters } from './bike_search_filters.js';
+import { initLocationBar } from './location_bar.js';
 
 // Create an event bus to allow components to communicate with each other.
 // Custom events on the event bus include:
@@ -85,3 +86,6 @@ initBikeSearchFilters(filtersEl, events);
 
 // Start watching the user's location.
 startGeolocation(events);
+
+// Initialize the location bar.
+initLocationBar(events);
