@@ -40,4 +40,14 @@ async function getStationReports() {
   return reports;
 }
 
-export { app, analytics, db, getStationReports };
+async function addStationReport(stationId, delta) {
+  const reportsColl = collection(db, 'station_reports');
+  await addDoc(reportsColl, {
+    station_id: stationId,
+    timestamp: new Date(),
+    type: 'docks',
+    delta,
+  });
+}
+
+export { app, analytics, db, getStationReports, addStationReport };

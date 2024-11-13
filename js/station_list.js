@@ -1,4 +1,5 @@
 import { htmlToElement } from './dom_utils.js';
+import { createStationReport } from './station_data.js';
 
 function initList(el, events) {
   el.innerHTML = '';
@@ -38,6 +39,20 @@ function initList(el, events) {
         } else {
           events.dispatchEvent(new CustomEvent('stationselected', { detail: station }));
         }
+      });
+
+      const incrementButton = listItem.querySelector('.report-dock-count-button.increment');
+      incrementButton.addEventListener('click', (evt) => {
+        evt.stopPropagation(); // Do not emit a click for the list item.
+        createStationReport(station.properties.station_id, 1);
+        events.dispatchEvent(new CustomEvent('dockcountincrement', { detail: station }));
+      });
+
+      const decrementButton = listItem.querySelector('.report-dock-count-button.decrement');
+      decrementButton.addEventListener('click', (evt) => {
+        evt.stopPropagation(); // Do not emit a click for the list item.
+        createStationReport(station.properties.station_id, -1);
+        events.dispatchEvent(new CustomEvent('dockcountdecrement', { detail: station }));
       });
 
       el.appendChild(listItem);
@@ -112,6 +127,18 @@ function initList(el, events) {
   events.addEventListener('stationdeselected', (evt) => {
     const stationId = evt.detail.properties.station_id;
     deselectListItem(stationId);
+  });
+
+  events.addEventListener('dockcountincrement', (evt) => {
+    const station = evt.detail;
+    station.properties.status.reported_docks_available += 1;
+    updateStationStatusInfo();
+  });
+
+  events.addEventListener('dockcountdecrement', (evt) => {
+    const station = evt.detail;
+    station.properties.status.reported_docks_available -= 1;
+    updateStationStatusInfo();
   });
 }
 

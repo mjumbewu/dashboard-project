@@ -1,4 +1,5 @@
-import { getStationReports } from './firebase.js';
+import { getStationReports, addStationReport } from './firebase.js';
+import _debounce from 'https://esm.run/lodash/debounce';
 
 async function downloadStationData() {
   function gbfsStationToFeature(station) {
@@ -99,4 +100,27 @@ async function updateStationStatuses(stations) {
   return [stations, statuses];
 }
 
-export { downloadStationData, downloadStationStatuses, updateStationStatuses };
+let deltasToSend = {};
+function createStationReport(stationId, delta) {
+  if (deltasToSend[stationId] === undefined) {
+    deltasToSend[stationId] = 0;
+  }
+
+  deltasToSend[stationId] += delta;
+
+  if (deltasToSend[stationId] === 0) {
+    delete deltasToSend[stationId];
+  }
+
+  sendStationDeltas();
+}
+
+const sendStationDeltas = _debounce(async () => {
+  for (const [stationId, delta] of Object.entries(deltasToSend)) {
+    console.log(`Sending delta for station ${stationId}: ${delta}`);
+    await addStationReport(stationId, delta);
+  }
+  deltasToSend = {};
+}, 2000);
+
+export { downloadStationData, downloadStationStatuses, updateStationStatuses, createStationReport };
