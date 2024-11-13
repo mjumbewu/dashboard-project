@@ -11,11 +11,11 @@ function initList(el, events) {
     const stations = evt.detail;
     for (const station of stations) {
       const listItem = htmlToElement(`
-        <li class="station" aria-expanded="false">
+        <li class="station" aria-expanded="false" id="station_list_item_${station.properties.station_id}">
           <header class="name">${station.properties.name}</header>
           <span class="distance" title="Station distance from map center">${station.properties.distance || '&hellip;'}</span>
           <span class="available-bikes" title="Number of suitable bikes available at the station">${station.properties.status.num_bikes_available} bikes</span>
-          <span class="available-docks" title="Number of open docks available at the station">${station.properties.status.num_docks_available} docks</span>
+          <span class="available-docks" title="Number of open docks available at the station">${station.properties.status.reported_docks_available} docks</span>
           <!--
           <span class="next-drop-off-est" title="Approximate time between drop offs of suitable bikes">(~10 min)</span>
           <span class="next-pick-up-est" title="Approximate time between docks opening up">(~15 min)</span>
@@ -49,7 +49,7 @@ function initList(el, events) {
         (showElectricBikes ? station.properties.status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0);
       listItem.querySelector('.available-bikes').textContent = `${bikes} bike${bikes !== 1 ? 's' : ''}`;
 
-      const docks = station.properties.status.num_docks_available;
+      const docks = station.properties.status.reported_docks_available;
       listItem.querySelector('.available-docks').textContent = `${docks} dock${docks !== 1 ? 's' : ''}`;
     }
   }

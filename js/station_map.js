@@ -103,7 +103,7 @@ function initMap(el, events, mapboxKey) {
       const bikes =
         (showClassicBikes ? status.num_bikes_available_types['classic'] : 0) +
         (showElectricBikes ? status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0);
-      const docks = status.num_docks_available;
+      const docks = status.reported_docks_available;
 
       // Calculate the total capacity of the station as the sum of the number
       // of bikes and the number of docks available. Convert the values to
