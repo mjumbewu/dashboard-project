@@ -6,6 +6,13 @@ function initAddressSearch(el, events, mapboxKey) {
   autocompleteOptionsList.classList.add('autocomplete-options');
   el.after(autocompleteOptionsList);
 
+  // Check whether there is an `address` parameter in the URL and pre-fill the input field if it exists.
+  const params = new URLSearchParams(location.search);
+  const address = params.get('address');
+  if (address) {
+    el.value = address;
+  }
+
   async function showAutocompleteOptions() {
     const query = el.value;
     const url = `https://api.mapbox.com/search/geocode/v6/forward?q=${query}&access_token=${mapboxKey}&bbox=-75.31606,39.86528,-74.87932,40.12799&types=place,neighborhood,address,street`;

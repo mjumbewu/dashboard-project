@@ -92,6 +92,14 @@ function initMap(el, events, mapboxKey) {
   let showElectricBikes = true;
   let minBatteryLevel = 0;
 
+  // Check whether there is a `coordinates` parameter in the URL and set the map center if it exists.
+  const params = new URLSearchParams(location.search);
+  const coordinates = params.get('coordinates');
+  if (coordinates) {
+    const [lng, lat] = coordinates.split(',').map(Number);
+    map.setView([lat, lng], 16);
+  }
+
   /**
    * Update the station markers to reflect the current station statuses.
    * This function is called every time the statusesupdated event is fired.
