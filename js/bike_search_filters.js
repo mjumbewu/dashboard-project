@@ -29,6 +29,29 @@ function initBikeSearchFilters(el, events) {
     batterySlider.disabled = !force;
   }
 
+  function loadBikeFiltersFromStorage() {
+    const storedBikeFilters = localStorage.getItem('bike_filters');
+    if (storedBikeFilters) {
+      const filters = JSON.parse(storedBikeFilters);
+
+      if (filters.electric && filters.classic) {
+        bikeTypeSelect.value = 'all';
+      } else if (filters.electric) {
+        bikeTypeSelect.value = 'electric';
+      } else if (filters.classic) {
+        bikeTypeSelect.value = 'classic';
+      } else {  // If, somehow, neither electric nor classic is allowed, default to 'all'
+        bikeTypeSelect.value = 'all';
+      }
+
+      if (filters.minBattery !== undefined && filters.minBattery !== null) {
+        batterySlider.value = filters.minBattery;
+      }
+
+      events.dispatchEvent(new CustomEvent('bikefilterchange', { detail: filters }));
+    }
+  }
+
   bikeTypeSelect.addEventListener('change', (e) => {
     toggleBatterySlider();
 
@@ -41,6 +64,7 @@ function initBikeSearchFilters(el, events) {
     events.dispatchEvent(evt);
   });
 
+  loadBikeFiltersFromStorage();
   toggleBatterySlider();
 }
 

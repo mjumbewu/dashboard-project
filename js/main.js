@@ -4,6 +4,7 @@ import { initMap } from './station_map.js';
 import { initList } from './station_list.js';
 import { initAddressSearch } from './address_search.js';
 import { initBikeSearchFilters } from './bike_search_filters.js';
+import { initAppState } from './app_state.js';
 
 // Create an event bus to allow components to communicate with each other.
 // Custom events on the event bus include:
@@ -82,6 +83,9 @@ initAddressSearch(searchEl, events, mapboxKey);
 // Initialize the bike filters component.
 const filtersEl = document.querySelector('.bike-search-controls');
 initBikeSearchFilters(filtersEl, events);
+
+// Initialize the "component" managing the application state storage.
+initAppState(events);
 
 // Start watching the user's location.
 startGeolocation(events);
