@@ -5,14 +5,19 @@ function initList(el, events) {
   let showClassicBikes = true;
   let showElectricBikes = true;
   let minBatteryLevel = 0;
+  let favoritedStations = new Set();
 
   const stationListItems = {};
   events.addEventListener('stationsloaded', (evt) => {
     const stations = evt.detail;
     for (const station of stations) {
+      const isFavorited = favoritedStations.has(station.properties.station_id);
       const listItem = htmlToElement(`
-        <li class="station" aria-expanded="false">
-          <header class="name">${station.properties.name}</header>
+        <li class="station" aria-expanded="false" data-favorite="${isFavorited}">
+          <header class="name">
+            <span class="station-name">${station.properties.name}</span>
+            <button class="favorite-toggle" aria-label="Toggle favorite"></button>
+          </header>
           <span class="distance" title="Station distance from map center">${station.properties.distance || '&hellip;'}</span>
           <span class="available-bikes" title="Number of suitable bikes available at the station">${station.properties.status.num_bikes_available} bikes</span>
           <span class="available-docks" title="Number of open docks available at the station">${station.properties.status.num_docks_available} docks</span>
@@ -22,16 +27,53 @@ function initList(el, events) {
           -->
         </li>
       `);
+
+      listItem.querySelector('.favorite-toggle').addEventListener('click', () => {
+        const stationId = station.properties.station_id;
+        if (favoritedStations.has(stationId)) {
+          favoritedStations.delete(stationId);
+        } else {
+          favoritedStations.add(stationId);
+        }
+        listItem.dataset.favorite = favoritedStations.has(station.properties.station_id);
+        localStorage.setItem('favorited_stations', JSON.stringify(Array.from(favoritedStations)));
+        sortListItemsByDistance();
+      });
+
       stationListItems[station.properties.station_id] = {listItem, station};
-      el.appendChild(listItem);
+      if (!isFavorited) {
+        el.appendChild(listItem);
+      } else {
+        el.insertBefore(listItem, el.querySelector('.station[data-favorite="false"]'));
+      }
     }
     updateStationStatusInfo();
   });
+
+  function loadFavoritedStationsFromStorage() {
+    const stored = localStorage.getItem('favorited_stations');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          favoritedStations = new Set(parsed);
+        }
+      } catch (e) {
+        console.error('Failed to load favorited stations from storage', e);
+      }
+    }
+  }
 
   function sortListItemsByDistance() {
     el.innerHTML = '';
     const items = Object.values(stationListItems);
     items.sort((a, b) => {
+      const aIsFavorited = favoritedStations.has(a.station.properties.station_id);
+      const bIsFavorited = favoritedStations.has(b.station.properties.station_id);
+      if (aIsFavorited && !bIsFavorited) return -1;
+      if (!aIsFavorited && bIsFavorited) return 1;
+
+      // If both are favorited or both are not favorited, sort by distance
       const aDistance = a.station.properties.distance || Infinity;
       const bDistance = b.station.properties.distance || Infinity;
       return aDistance - bDistance;
@@ -68,6 +110,8 @@ function initList(el, events) {
     minBatteryLevel = evt.detail.minBattery;
     updateStationStatusInfo();
   });
+
+  loadFavoritedStationsFromStorage();
 }
 
 export { initList };

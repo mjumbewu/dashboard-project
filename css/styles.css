@@ -134,6 +134,26 @@ body {
 .station .name {
   grid-area: name;
   font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.station .favorite-toggle {
+	padding: 0;
+	border: none;
+	background-color: transparent;
+	font-size: 1.5rem;
+	color: gold;
+}
+
+.station[data-favorite="true"] .favorite-toggle::after {
+  content: "★";
+}
+
+.station[data-favorite="false"] .favorite-toggle::after {
+  content: "☆";
 }
 
 .station .distance {
