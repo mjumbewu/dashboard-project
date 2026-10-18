@@ -13,18 +13,29 @@ function initList(el, events) {
     for (const station of stations) {
       const isFavorited = favoritedStations.has(station.properties.station_id);
       const listItem = htmlToElement(`
-        <li class="station" aria-expanded="false" data-favorite="${isFavorited}">
-          <header class="name">
-            <span class="station-name">${station.properties.name}</span>
-            <button class="favorite-toggle" aria-label="Toggle favorite"></button>
-          </header>
-          <span class="distance" title="Station distance from map center">${station.properties.distance || '&hellip;'}</span>
-          <span class="available-bikes" title="Number of suitable bikes available at the station">${station.properties.status.num_bikes_available} bikes</span>
-          <span class="available-docks" title="Number of open docks available at the station">${station.properties.status.num_docks_available} docks</span>
-          <!--
-          <span class="next-drop-off-est" title="Approximate time between drop offs of suitable bikes">(~10 min)</span>
-          <span class="next-pick-up-est" title="Approximate time between docks opening up">(~15 min)</span>
-          -->
+        <li class="station" data-favorite="${isFavorited}">
+          <details>
+            <summary>
+              <header class="name">
+                <span class="station-name">${station.properties.name}</span>
+                <button class="favorite-toggle" aria-label="${isFavorited ? 'Remove this station from favorites' : 'Add this station to favorites'}"></button>
+              </header>
+              <span class="distance" title="Station distance from map center">${station.properties.distance || '&hellip;'}</span>
+              <span class="available-bikes" title="Number of suitable bikes available at the station">${station.properties.status.num_bikes_available} bikes</span>
+              <span class="available-docks" title="Number of open docks available at the station">${station.properties.status.num_docks_available} docks</span>
+            </summary>
+
+            <div class="report-dock-count">
+              <p>Are we showing the wrong number of docks available? Adjust the number so that other riders know:</p>
+              <button class="report-dock-count-button increment" title="Add 1 to the number of docks available">+</button>
+              <button class="report-dock-count-button decrement" title="Subtract 1 from the number of docks available">-</button>
+            </div>
+
+            <!--
+            <span class="next-drop-off-est" title="Approximate time between drop offs of suitable bikes">(~10 min)</span>
+            <span class="next-pick-up-est" title="Approximate time between docks opening up">(~15 min)</span>
+            -->
+          </details>
         </li>
       `);
 

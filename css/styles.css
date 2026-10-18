@@ -115,6 +115,11 @@ body {
 }
 
 .stations-list .station {
+  padding: 0.5rem;
+  border-bottom: 1px solid black;
+}
+
+.stations-list .station summary {
   display: grid;
   grid-template-areas: "name             name"
                         "blank           distance"
@@ -122,9 +127,6 @@ body {
                         "drop-off-info   pick-up-info"
                         "details         details";
   grid-template-columns: 1fr 1fr;
-
-  padding: 0.5rem;
-  border-bottom: 1px solid black;
 }
 
 .stations-list .station:first-child {
