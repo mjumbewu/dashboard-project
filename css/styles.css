@@ -208,5 +208,23 @@ body {
   width: 100%;
   height: 4rem;
   background-color: silver;
+}
 
+.station .report-dock-count {
+  text-align: center;
+}
+
+.station .report-dock-count p {
+  text-align: left;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.station .report-dock-count button {
+  width: 2rem;
+  height: 2rem;
+  margin: 0 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
 }
