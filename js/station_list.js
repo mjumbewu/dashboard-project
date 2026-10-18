@@ -20,7 +20,10 @@ function initList(el, events) {
                 <span class="station-name">${station.properties.name}</span>
                 <button class="favorite-toggle" aria-label="${isFavorited ? 'Remove this station from favorites' : 'Add this station to favorites'}"></button>
               </header>
-              <span class="distance" title="Station distance from map center">${station.properties.distance || '&hellip;'}</span>
+              <span class="distance" title="Station distance from map center">
+                <span class="visually-hidden">${station.properties.distance || 'Unknown distance'} from map center</span>
+                <span aria-hidden="true">${station.properties.distance || '&hellip;'}</span>
+              </span>
               <span class="available-bikes" title="Number of suitable bikes available at the station">${station.properties.status.num_bikes_available} bikes</span>
               <span class="available-docks" title="Number of open docks available at the station">${station.properties.status.num_docks_available} docks</span>
             </summary>
@@ -41,12 +44,19 @@ function initList(el, events) {
 
       listItem.querySelector('.favorite-toggle').addEventListener('click', () => {
         const stationId = station.properties.station_id;
-        if (favoritedStations.has(stationId)) {
+
+        let isFavorited = favoritedStations.has(stationId);
+        if (isFavorited) {
           favoritedStations.delete(stationId);
         } else {
           favoritedStations.add(stationId);
         }
-        listItem.dataset.favorite = favoritedStations.has(station.properties.station_id);
+        isFavorited = !isFavorited;
+        listItem.dataset.favorite = isFavorited;
+
+        const favoriteBtn = listItem.querySelector('.favorite-toggle');
+        favoriteBtn.setAttribute('aria-label', isFavorited ? 'Remove this station from favorites' : 'Add this station to favorites');
+
         localStorage.setItem('favorited_stations', JSON.stringify(Array.from(favoritedStations)));
         sortListItemsByDistance();
       });

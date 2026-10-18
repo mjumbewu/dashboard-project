@@ -157,7 +157,7 @@ function initMap(el, events, mapboxKey) {
       // Flip around the coordinates to be [lat, lng].
       const latlng = [station.geometry.coordinates[1], station.geometry.coordinates[0]];
       // Create a marker for the station and add it to the stations layer.
-      const marker = L.marker(latlng, { icon: stationIcon });
+      const marker = L.marker(latlng, { icon: stationIcon, keyboard: false });
       marker.feature = station;
       marker.bindTooltip(station.properties.name);
       marker.addTo(stationsLayer);
