@@ -110,8 +110,10 @@ function initMap(el, events, mapboxKey) {
       const status = station.properties.status;
       const bikes =
         (showClassicBikes ? status.num_bikes_available_types['classic'] : 0) +
-        (showElectricBikes ? status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0);
-      const docks = status.num_docks_available;
+        (showElectricBikes ? status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0) +
+        (station.properties.reports ? station.properties.reports.filter((report) => report.type === 'bikes').reduce((acc, report) => acc + report.delta, 0) : 0);
+      const docks = status.num_docks_available +
+        (station.properties.reports ? station.properties.reports.filter((report) => report.type === 'docks').reduce((acc, report) => acc + report.delta, 0) : 0);
 
       // Calculate the total capacity of the station as the sum of the number
       // of bikes and the number of docks available. Convert the values to
@@ -169,6 +171,11 @@ function initMap(el, events, mapboxKey) {
   // Listen for the statusesupdated event, which is fired when the station
   // statuses are updated.
   events.addEventListener('statusesupdated', (evt) => {
+    updateStationMarkers();
+  });
+
+  // Listen for the reportsupdated event, which is fired when there are new station reports.
+  events.addEventListener('reportsupdated', (evt) => {
     updateStationMarkers();
   });
 
