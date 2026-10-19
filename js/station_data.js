@@ -1,3 +1,6 @@
+import { addStationReport } from './firebase.js';
+import lodash from 'https://cdn.jsdelivr.net/npm/lodash@4.18.1/+esm'
+
 async function downloadStationData() {
   function gbfsStationToFeature(station) {
     return {
@@ -68,4 +71,20 @@ async function updateStationStatuses(stations) {
   return [stations, statuses];
 }
 
-export { downloadStationData, downloadStationStatuses, updateStationStatuses };
+const reportsToSend = {};
+const debouncedAddStationReport = lodash.debounce(async (stationId, type) => {
+  const value = reportsToSend[stationId]?.[type];
+  if (!value) return;
+  await addStationReport(stationId, type, value);
+  delete reportsToSend[stationId]?.[type];
+}, 2000);
+
+function createStationReport(stationId, type, value) {
+  reportsToSend[stationId] ||= {};
+  reportsToSend[stationId][type] ||= 0;
+  reportsToSend[stationId][type] += value;
+
+  debouncedAddStationReport(stationId, type);
+}
+
+export { downloadStationData, downloadStationStatuses, updateStationStatuses, createStationReport };

@@ -1,3 +1,4 @@
+import { createStationReport } from './station_data.js';
 import { htmlToElement } from './dom_utils.js';
 
 function initList(el, events) {
@@ -59,6 +60,18 @@ function initList(el, events) {
 
         localStorage.setItem('favorited_stations', JSON.stringify(Array.from(favoritedStations)));
         sortListItemsByDistance();
+      });
+
+      listItem.querySelector('.report-dock-count .increment').addEventListener('click', async (evt) => {
+        const availableDocksDisplay = listItem.querySelector('.available-docks');
+        createStationReport(station.properties.station_id, 'docks', 1);
+        availableDocksDisplay.textContent = `${parseInt(availableDocksDisplay.textContent) + 1} docks`;
+      });
+
+      listItem.querySelector('.report-dock-count .decrement').addEventListener('click', async (evt) => {
+        const availableDocksDisplay = listItem.querySelector('.available-docks');
+        createStationReport(station.properties.station_id, 'docks', -1);
+        availableDocksDisplay.textContent = `${parseInt(availableDocksDisplay.textContent) - 1} docks`;
       });
 
       stationListItems[station.properties.station_id] = {listItem, station};
