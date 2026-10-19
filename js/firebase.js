@@ -1,7 +1,15 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -45,6 +53,63 @@ async function addStationReport(stationId, type, delta) {
   });
 }
 
+/**
+ * Retrieves all station reports from the Firestore database. Each report
+ * includes the station ID, the type of report, and the change in the number of
+ * bikes or docks (delta).
+ *
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of station reports.
+ */
+async function getStationReports() {
+  const reportsColl = collection(db, 'station_reports');
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+  const recentReportsQuery = query(
+    collection(db, 'station_reports'),
+    where('timestamp', '>', oneHourAgo),
+  );
+  const querySnapshot = await getDocs(recentReportsQuery);
+
+  const reports = [];
+  querySnapshot.forEach((docSnapshot) => {
+    // docSnapshot is metadata; .data() extracts the actual fields!
+    reports.push(docSnapshot.data());
+  });
+  return reports;
+}
+
+/**
+ * Subscribes to real-time updates of recent station reports from the Firestore
+ * database. The callback will be invoked whenever there are new reports within
+ * the last hour.
+ *
+ * @param {function(Array<Object>): void} callback A callback function that will
+ * be invoked with the array of recent station reports.
+ * @returns {function(): void} A function that can be called to unsubscribe from
+ * the real-time updates.
+ */
+function subscribeToStationReports(callback) {
+  const reportsColl = collection(db, 'station_reports');
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+  const recentReportsQuery = query(
+    reportsColl,
+    where('timestamp', '>', oneHourAgo),
+  );
+
+  const unsubscribe = onSnapshot(recentReportsQuery, (querySnapshot) => {
+    const reports = [];
+    querySnapshot.forEach((docSnapshot) => {
+      reports.push(docSnapshot.data());
+    });
+    callback(reports);
+  });
+
+  return unsubscribe;
+}
+
 export {
   addStationReport,
+  getStationReports,
+  subscribeToStationReports,
 };

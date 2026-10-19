@@ -1,4 +1,4 @@
-import { downloadStationData, updateStationStatuses } from './station_data.js';
+import { downloadStationData, updateStationStatuses, listenForStationReports } from './station_data.js';
 import { startGeolocation } from './geolocation.js';
 import { initMap } from './station_map.js';
 import { initList } from './station_list.js';
@@ -15,6 +15,11 @@ import { initAppState } from './app_state.js';
 // - statusesupdated: Fired when the station statuses are updated.
 //     Detail is an object of station statuses. Keys are station IDs and
 //     values are objects from https://gbfs.bcycle.com/bcycle_indego/station_status.json.
+//
+// - reportsupdated: Fired when there are new station reports.
+//     Detail is an array of station reports. Each report includes the station
+//     ID, the type of report, and the change in the number of bikes or docks
+//     (delta).
 //
 // - positionfound: Fired when the user's location is found.
 //     Detail is a GeolocationPosition object.
@@ -65,6 +70,12 @@ downloadStationData().then((stations) => {
     const evt = new CustomEvent('statusesupdated', { detail: statuses });
     events.dispatchEvent(evt);
   }, 30000);
+
+  // Listen for real-time station reports and update the stations accordingly.
+  listenForStationReports(stations, (reports) => {
+    const evt = new CustomEvent('reportsupdated', { detail: reports });
+    events.dispatchEvent(evt);
+  });
 });
 
 const mapboxKey = 'pk.eyJ1IjoibWp1bWJlLXRlc3QiLCJhIjoiY2w3ZTh1NTIxMTgxNTQwcGhmODU2NW5kaSJ9.pBPd19nWO-Gt-vTf1pOHBA';

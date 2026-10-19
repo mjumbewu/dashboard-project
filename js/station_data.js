@@ -1,4 +1,4 @@
-import { addStationReport } from './firebase.js';
+import { addStationReport, subscribeToStationReports } from './firebase.js';
 import lodash from 'https://cdn.jsdelivr.net/npm/lodash@4.18.1/+esm'
 
 async function downloadStationData() {
@@ -87,4 +87,13 @@ function createStationReport(stationId, type, value) {
   debouncedAddStationReport(stationId, type);
 }
 
-export { downloadStationData, downloadStationStatuses, updateStationStatuses, createStationReport };
+function listenForStationReports(stations, callback) {
+  return subscribeToStationReports((reports) => {
+    for (const station of stations) {
+      station.properties.reports = reports.filter(report => report.station_id === station.properties.station_id);
+    }
+    callback(reports);
+  });
+}
+
+export { downloadStationData, downloadStationStatuses, updateStationStatuses, createStationReport, listenForStationReports };

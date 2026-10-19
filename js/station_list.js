@@ -122,15 +122,21 @@ function initList(el, events) {
     for (const {listItem, station} of Object.values(stationListItems)) {
       const bikes =
         (showClassicBikes ? station.properties.status.num_bikes_available_types['classic'] : 0) +
-        (showElectricBikes ? station.properties.status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0);
+        (showElectricBikes ? station.properties.status.bikes.filter((b) => b.isElectric && (minBatteryLevel == 0 || b.battery >= minBatteryLevel)).length : 0) +
+        (station.properties.reports ? station.properties.reports.filter((report) => report.type === 'bikes').reduce((acc, report) => acc + report.delta, 0) : 0);
       listItem.querySelector('.available-bikes').textContent = `${bikes} bike${bikes !== 1 ? 's' : ''}`;
 
-      const docks = station.properties.status.num_docks_available;
+      const docks = station.properties.status.num_docks_available +
+        (station.properties.reports ? station.properties.reports.filter((report) => report.type === 'docks').reduce((acc, report) => acc + report.delta, 0) : 0);
       listItem.querySelector('.available-docks').textContent = `${docks} dock${docks !== 1 ? 's' : ''}`;
     }
   }
 
   events.addEventListener('statusesupdated', (evt) => {
+    updateStationStatusInfo();
+  });
+
+  events.addEventListener('reportsupdated', (evt) => {
     updateStationStatusInfo();
   });
 
